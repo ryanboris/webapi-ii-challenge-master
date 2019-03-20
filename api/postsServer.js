@@ -1,8 +1,7 @@
 const express = require('express')
 const router = express.Router()
-const db = require('../data/db.js')
+const db = require('../data/db')
 
-router.use(express.json())
 
 router.get('/', async (req, res) => {
   try {
@@ -10,7 +9,7 @@ router.get('/', async (req, res) => {
     res.status(200).json(posts)
   } catch {
     res.status(500).json({
-      message: '500 <-> Internal Server Error',
+      message: '500 <-> Internal Server : Oops! The server is experienced a problem.  Please try your request again!',
     })
   }
 })
@@ -24,7 +23,7 @@ router.get('/:id', async (req, res) => {
       : res.status(200).json(post)
   } catch  {
     res.status(500).json({
-      message: '500 <-> Internal Server Error',
+      message: '500 <-> Internal Server Error: Oops! The server is experienced a problem.  Please try your request again!',
     })
   }
 })
@@ -32,7 +31,7 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   const { title, contents } = req.body
   if (!title || !contents) {
-    res.status(400).json({ message: '400 <-> Bad Request' })
+    res.status(400).json({ message: '400 <-> Bad Request: Please provide a title and content body for the post.' })
   }
   else {
     try {
@@ -40,7 +39,7 @@ router.post('/', async (req, res) => {
       res.status(201).json(posts)
     } catch {
       res.status(500).json({
-        message: '500 <-> Internal Server Error',
+        message: '500 <-> Internal Server Error: Oops! The server is experienced a problem.  Please try your request again!',
       })
     }
   }
@@ -67,11 +66,12 @@ router.put('/:id', async (req, res) => {
   }
   else {
     try {
-      const updateCount = await db.update(id, req.body)
+      const [updateCount, user] = await Promise.all([db.update(id, req.body), db.findById(id)])
       updateCount === 1
-        ? res.status(200).json(updateCount)
+        ? res.status(200).json(user)
         : res.status(404).json({ message: '404 <-> Not Found' })
-    } catch  {
+    } catch (e)  {
+      console.log(e)
       res.status(500).json({
         message: '500 <-> Internal Server Error'
       })

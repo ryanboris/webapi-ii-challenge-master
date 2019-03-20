@@ -11,7 +11,7 @@ const winston = require('./config/winstonConfigStreamConsole.js')
 // const winston = require('./config/winstonConfigRotate.js')
 
 const app = express()
-
+app.use(express.json())
 app.use(helmet())
 app.use(cors())
 app.use(morgan('short'))
